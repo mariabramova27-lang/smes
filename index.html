@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рабочие листы · Смеси и сплавы · Мягкая математика</title>
+<style>
+  :root{
+    --bg:#f7f2ff; --ink:#2a2350; --soft:#7a6fa8;
+    --p1:#8b6dff; --p1d:#6c4ae0; --p2:#ff8fb1; --p3:#5ed0b8; --gold:#ffce54;
+    --ok:#4caf7d; --err:#ff6b6b; --line:#ece4fa;
+    --sh:0 10px 30px rgba(74,54,140,.10);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,'Nunito',sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #ffe3ef 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 10%, #dcf8f1 0%, transparent 55%),
+      radial-gradient(900px 500px at 50% 110%, #ffe9c9 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink); min-height:100vh; overflow-x:hidden;
+  }
+  #fx{position:fixed;inset:0;pointer-events:none;z-index:150;overflow:hidden}
+  .particle{position:absolute;font-size:20px;animation:fall 1.5s linear forwards}
+  @keyframes fall{to{transform:translateY(115vh) rotate(540deg);opacity:0}}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:20px 16px 110px;position:relative;z-index:2}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14.5px;color:var(--ink)}
+  .brand-logo{
+    width:36px;height:36px;border-radius:11px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--p1),var(--p2));
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+    box-shadow:0 6px 16px rgba(139,109,255,.35);position:relative;
+  }
+  .brand-logo::after{content:"";position:absolute;inset:3px;border-radius:8px;border:1.5px solid rgba(255,255,255,.55)}
+  .brand-text{display:flex;flex-direction:column;line-height:1.05}
+  .brand-text b{font-size:14.5px}
+  .brand-text span{font-size:11px;font-weight:700;color:var(--soft);letter-spacing:.4px}
+  .stats{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:700;font-size:13.5px;box-shadow:var(--sh);display:flex;align-items:center;gap:5px}
+  .chip.coins{background:linear-gradient(135deg,#fff8e1,#ffeec2);border-color:#ffe1a3}
+  .chip.coins b{color:#a06b12}
+  .menu-btn{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px;color:var(--p1);cursor:pointer;box-shadow:var(--sh);transition:.2s;font-family:inherit}
+  .menu-btn:hover{background:#f3ecff;transform:translateY(-1px)}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--sh);padding:24px;animation:pop .4s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(139,109,255,.4)}50%{box-shadow:0 0 0 10px rgba(139,109,255,0)}}
+
+  button{font-family:inherit;font-weight:800;font-size:15px;border:none;border-radius:14px;padding:12px 20px;cursor:pointer;transition:transform .12s, box-shadow .2s, filter .2s}
+  button:active{transform:scale(.96)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .btn-p{background:linear-gradient(135deg,var(--p1),#a58bff);color:#fff;box-shadow:0 10px 24px rgba(139,109,255,.4)}
+  .btn-p:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-2px)}
+  .btn-g{background:#eafff6;color:#2a8871;border:1px solid #b9ecd9}
+  .btn-g:hover:not(:disabled){background:#dbfff0}
+  .btn-n{background:#f3ecff;color:var(--p1);border:1px solid var(--line)}
+  .btn-n:hover{background:#ebe2ff}
+
+  /* INTRO */
+  .hero{text-align:center;padding:26px 18px}
+  .hero h1{font-size:clamp(22px,4vw,32px);margin:6px 0 8px;letter-spacing:-.5px;
+    background:linear-gradient(135deg,var(--p1d),var(--p2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .tag{color:var(--p1);font-weight:800;font-size:12px;letter-spacing:1.4px;text-transform:uppercase}
+  .hero p{color:var(--soft);max-width:640px;margin:10px auto 18px;line-height:1.6;font-size:14.5px}
+  .level-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0 10px;text-align:left}
+  .level-card{background:linear-gradient(135deg,#faf8ff,#f3ecff);border:2px solid var(--line);border-radius:20px;padding:18px;cursor:pointer;transition:.25s;position:relative;overflow:hidden}
+  .level-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(139,109,255,.2);border-color:var(--p1)}
+  .level-card .lv-emoji{font-size:34px;display:block;margin-bottom:6px}
+  .level-card .lv-title{font-size:17px;font-weight:900;color:var(--ink);margin-bottom:4px}
+  .level-card .lv-grade{font-size:12px;font-weight:800;color:var(--p1d);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+  .level-card .lv-desc{font-size:13px;color:var(--soft);line-height:1.5;margin-bottom:10px}
+  .level-card .lv-progress{height:8px;background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-top:8px}
+  .level-card .lv-progress div{height:100%;background:linear-gradient(90deg,var(--p1),var(--p2));transition:.6s;width:0}
+  .level-card .lv-done{position:absolute;top:14px;right:14px;font-size:20px;opacity:0;transition:.3s}
+  .level-card.done .lv-done{opacity:1}
+
+  .promo-line{margin-top:18px;font-size:12.5px;color:var(--soft);line-height:1.6;text-align:center}
+  .promo-line b{color:var(--p1d)}
+  .promo-line a{color:#5a3fd6;font-weight:700;text-decoration:none;border-bottom:1px dashed #c9b8ff}
+
+  /* HERO-QUOTE */
+  .hero-say{display:flex;gap:12px;align-items:flex-start;background:linear-gradient(135deg,#faf8ff,#f3ecff);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:14px 0;text-align:left}
+  .hero-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#2a2350,#4a3a8a);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 6px 14px rgba(42,35,80,.25);animation:float 3.5s ease-in-out infinite}
+  .hero-text{font-size:14.5px;line-height:1.55;color:var(--ink)}
+  .hero-text b{color:var(--p1d)}
+
+  /* STAGE */
+  .stage-head{margin-bottom:14px}
+  .stage-head .world{font-size:11.5px;font-weight:800;color:var(--p1);letter-spacing:1.3px;text-transform:uppercase}
+  .stage-head h2{font-size:20px;margin:4px 0 8px;letter-spacing:-.3px;
+    background:linear-gradient(135deg,var(--ink),var(--p1d));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .dots{display:flex;gap:5px;margin-top:8px}
+  .dots span{width:22px;height:6px;border-radius:3px;background:#efe7ff;transition:.3s}
+  .dots span.done{background:linear-gradient(90deg,var(--p1),var(--p2))}
+  .dots span.now{background:var(--p1);animation:glow 1.8s infinite}
+
+  .task-desc{background:linear-gradient(135deg,#faf8ff,#f3ecff);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:15px;line-height:1.6;margin-bottom:14px}
+  .task-desc b{color:var(--p1d)}
+
+  /* SORT */
+  .pool{display:flex;flex-wrap:wrap;gap:8px;padding:14px;background:#faf8ff;border:1.5px dashed #d9ccff;border-radius:16px;min-height:72px;margin:10px 0 14px}
+  .pool:empty::before{content:"Все карточки разложены ✓";color:var(--soft);font-size:13px;font-style:italic;margin:auto}
+  .chip-el{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:2px solid var(--line);border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;user-select:none;box-shadow:0 2px 4px rgba(74,54,140,.04)}
+  .chip-el:hover{border-color:#c9b8ff;transform:translateY(-1px)}
+  .chip-el.selected{border-color:var(--p1);background:#f3ecff;box-shadow:0 8px 18px rgba(139,109,255,.25);transform:translateY(-2px)}
+  .chip-el.placed{background:#eafff6;border-color:var(--ok);color:#2a8871}
+  .baskets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px}
+  .basket{background:#fff;border:2px dashed #d9ccff;border-radius:16px;padding:11px;min-height:120px;cursor:pointer;transition:.2s}
+  .basket:hover{border-color:#c9b8ff;background:#faf7ff}
+  .basket.active-drop{border-color:var(--p1);background:#f3ecff;box-shadow:0 0 0 3px rgba(139,109,255,.2)}
+  .basket.wrong{border-color:var(--err);background:#fff5f5;animation:shake .4s}
+  .basket-head{display:flex;align-items:center;gap:6px;font-weight:800;font-size:13.5px;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:8px;flex-wrap:wrap}
+  .basket-head .b-sub{font-size:11px;color:var(--soft);font-weight:600;margin-left:auto}
+  .basket-body{display:flex;flex-wrap:wrap;gap:6px;min-height:40px}
+  .basket-body:empty::before{content:"нажми сюда →";color:#c9b8ff;font-size:12px;font-style:italic}
+
+  /* CANDIES */
+  .candy-wrap{background:linear-gradient(135deg,#fff8e1,#ffeec2);border:2px solid #ffe1a3;border-radius:18px;padding:18px;margin:14px 0;text-align:center}
+  .candy-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:10px}
+  .candy-big{font-size:38px;transition:.2s;user-select:none;padding:4px;border-radius:10px}
+  .candy-big:hover{transform:scale(1.15)}
+  .candy-big.shake{animation:shake .4s}
+  .candy-legend{font-size:13px;color:#7a5a10;font-weight:700}
+
+  /* INPUTS */
+  .inputs-wrap{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+  .input-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px;background:#faf8ff;border:1px solid var(--line);border-radius:14px;transition:.2s}
+  .input-row.ok{border-color:var(--ok);background:#f0fff8}
+  .input-row.no{border-color:var(--err);background:#fff5f5}
+  .input-row .i-label{flex:1;min-width:170px;font-size:14px;font-weight:700;color:var(--ink);line-height:1.4}
+  .input-row .i-label .i-num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--p1);color:#fff;font-size:12px;font-weight:900;text-align:center;line-height:22px;margin-right:6px}
+  .input-row input{padding:10px 12px;font-size:15px;font-weight:800;font-family:inherit;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);width:120px;transition:.15s}
+  .input-row input:focus{outline:none;border-color:var(--p1);box-shadow:0 0 0 4px rgba(139,109,255,.15)}
+  .input-row input.shake{animation:shake .4s;border-color:var(--err)}
+  .input-row .i-unit{font-size:14px;font-weight:800;color:var(--p1d);min-width:24px}
+  .input-row .i-status{font-size:20px;font-weight:900;width:26px;text-align:center}
+
+  /* FEEDBACK */
+  .fb{margin-top:12px;padding:14px 16px;border-radius:14px;font-size:14px;line-height:1.6;animation:pop .3s ease}
+  .fb.ok{background:#eafff6;color:#2a8871;border:1px solid #b9ecd9}
+  .fb.no{background:#fff5f5;color:#c53a67;border:1px solid #ffd0dd}
+  .fb b{font-weight:900}
+
+  .hint-box{margin-top:10px;padding:12px 14px;background:linear-gradient(135deg,#fff8e1,#ffeec2);border:1px solid #ffe1a3;border-radius:12px;font-size:13.5px;line-height:1.55;color:#7a5a10}
+  .hint-box b{color:#a06b12}
+
+  /* PEARSON */
+  .pearson{background:linear-gradient(135deg,#faf8ff,#f3ecff);border:2px solid var(--line);border-radius:18px;padding:16px;margin:14px 0}
+  .p-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative}
+  .p-cell{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;text-align:center;font-weight:800;font-size:15px;color:var(--p1d)}
+  .p-cell.pct{background:linear-gradient(135deg,#8b6dff,#6c4ae0);color:#fff;font-size:17px}
+  .p-cell.pct2{background:linear-gradient(135deg,#ff8fb1,#e85b89);color:#fff;font-size:17px}
+  .p-cell.diff{background:linear-gradient(135deg,#fff4cf,#ffe0ef);color:#a06b12;border-color:#ffd6a8}
+  .p-center-row{grid-column:1 / -1;text-align:center;padding:8px 0;font-weight:900;font-size:15px;color:var(--p1d)}
+  .p-center-row .p-mid{display:inline-block;background:linear-gradient(135deg,#f3ecff,#ffe7f0);padding:8px 22px;border-radius:12px;border:2px solid var(--p1)}
+
+  /* CREATIVE */
+  .creative-wrap{margin:14px 0}
+  .creative-wrap textarea{width:100%;min-height:140px;padding:14px;font-family:inherit;font-size:14.5px;line-height:1.55;border:2px solid var(--line);border-radius:14px;background:#faf8ff;color:var(--ink);resize:vertical}
+  .creative-wrap textarea:focus{outline:none;border-color:var(--p1);background:#fff;box-shadow:0 0 0 4px rgba(139,109,255,.15)}
+
+  /* ADVANCE */
+  .advance-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .advance-row button{min-width:200px}
+
+  /* LEVEL SUMMARY */
+  .level-final{text-align:center;padding:20px 14px}
+  .trophy{font-size:76px;animation:float 2.4s ease-in-out infinite;display:inline-block}
+  .medal{display:inline-block;margin:12px auto;padding:10px 22px;border-radius:999px;background:linear-gradient(135deg,#fff4cf,#ffe0ef);border:1px solid #ffd6a8;font-weight:800;color:#a06b12;box-shadow:var(--sh);font-size:14px}
+  .recap{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px;max-width:560px;margin:16px auto;text-align:left}
+  .recap h3{margin:0 0 12px;font-size:16px;text-align:center;color:var(--p1d)}
+  .recap .r-line{display:flex;gap:10px;padding:9px 12px;background:linear-gradient(135deg,#faf8ff,#f3ecff);border-radius:11px;margin-bottom:8px;font-size:14px;font-weight:700;line-height:1.5}
+  .recap .r-line span:first-child{color:var(--p1d);font-weight:900;flex-shrink:0}
+
+  /* TOAST */
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(100px);background:linear-gradient(135deg,var(--p1),#a58bff);color:#fff;padding:14px 22px;border-radius:14px;font-weight:800;font-size:14.5px;box-shadow:0 14px 30px rgba(139,109,255,.35);z-index:300;opacity:0;transition:.4s;pointer-events:none;max-width:90vw;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .hidden{display:none!important}
+  .tiny{font-size:12.5px;color:var(--soft)}
+  .center{text-align:center}
+
+  @media(max-width:600px){
+    .wrap{padding:14px 12px 110px}
+    .card{padding:16px;border-radius:20px}
+    .p-grid{grid-template-columns:1fr}
+    .p-center-row{grid-column:1}
+    .input-row input{width:100px}
+    .level-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div id="fx"></div>
+<div id="toast"></div>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="brand-logo">📐</div>
+      <div class="brand-text"><b>Мягкая математика</b><span>Рабочие листы · Сплавы и смеси</span></div>
+    </div>
+    <div class="stats">
+      <div class="chip coins">💰 <b id="coins">0</b></div>
+      <button class="menu-btn" id="menuBtn" type="button">🏠 Меню</button>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<script>
+/* ==================== ДАННЫЕ ==================== */
+const LEVELS = [
+  {
+    id: 3,
+    emoji: '🐱',
+    title: 'Сладкая лаборатория',
+    grade: 'Рабочий лист · 3 класс',
+    heroName: 'Котэ-Косинус',
+    desc: 'Конфеты, мешочки и доля шоколада',
+    intro: 'Мяу! Представь: я нашёл на чердаке старый сундук. В нём — пакет конфет и два мешочка. Хочу открыть свою кондитерскую, но не знаю, как считать, сколько шоколада получится, если смешать. Поможешь?',
+    outro: 'Мяу! Спасибо! Теперь я знаю: шоколад не исчезает — он складывается. Это и есть главный секрет задач на смеси!',
+    tasks: [
+      {
+        id: 'l3t1', type: 'sort',
+        title: 'Что есть что?',
+        hero: '🐱',
+        story: 'В задачках на смеси всегда три героя. <b>Вещество</b> — что растворяем, <b>растворитель</b> — в чём растворяем, <b>смесь</b> — что получилось. Разложи карточки по корзинам!',
+        items: [
+          {id:'i1', emoji:'🧂', text:'5 г соли', correct:'solute'},
+          {id:'i2', emoji:'💧', text:'100 г воды', correct:'solvent'},
+          {id:'i3', emoji:'🥛', text:'105 г раствора', correct:'mixture'},
+          {id:'i4', emoji:'🍬', text:'20 г сахара', correct:'solute'},
+          {id:'i5', emoji:'🧃', text:'200 г компота', correct:'mixture'},
+          {id:'i6', emoji:'💦', text:'300 г воды', correct:'solvent'}
+        ],
+        baskets: [
+          {id:'solute', name:'Вещество', emoji:'🧂', sub:'что растворяем'},
+          {id:'solvent', name:'Растворитель', emoji:'💧', sub:'в чём растворяем'},
+          {id:'mixture', name:'Смесь', emoji:'🥛', sub:'что получилось'}
+        ],
+        solution: 'Соль и сахар — это <b>вещество</b>. Вода — <b>растворитель</b>. А раствор и компот — это <b>смеси</b> (то, что получилось).'
+      },
+      {
+        id: 'l3t2', type: 'inputs',
+        title: 'Конфеты и доля',
+        hero: '🐱',
+        story: 'У меня в пакете 10 конфет. Часть — шоколадные. Посмотри внимательно и ответь на вопросы!',
+        visual: 'candies',
+        candies: ['🍫','🍬','🍫','🍬','🍬','🍫','🍬','🍬','🍫','🍬'],
+        inputs: [
+          {label: 'Сколько шоколадных конфет?', answer: 4, unit: 'шт'},
+          {label: 'Сколько это процентов от всех конфет?', answer: 40, unit: '%'}
+        ],
+        solution: 'Шоколадных 4 из 10. Доля = 4/10 = 0,4 = <b>40%</b>.'
+      },
+      {
+        id: 'l3t3', type: 'inputs',
+        title: 'Два мешочка',
+        hero: '🐱',
+        story: 'Смешал мешочек А (100 г, 20% шоколадных) и мешочек Б (200 г, 50% шоколадных). Ответь по шагам!',
+        visual: 'two-bags',
+        inputs: [
+          {label: 'Сколько граммов шоколадных в мешочке А?', answer: 20, unit: 'г'},
+          {label: 'Сколько граммов шоколадных в мешочке Б?', answer: 100, unit: 'г'},
+          {label: 'Сколько граммов шоколадных в общей смеси?', answer: 120, unit: 'г'},
+          {label: 'Сколько весит вся смесь?', answer: 300, unit: 'г'},
+          {label: 'Какая доля шоколадных в смеси?', answer: 40, unit: '%'}
+        ],
+        solution: 'Шоколад в А: 100 × 0,20 = 20 г. Шоколад в Б: 200 × 0,50 = 100 г. Всего: 120 г из 300 г. 120/300 = 0,4 = <b>40%</b>.'
+      },
+      {
+        id: 'l3t4', type: 'creative',
+        title: 'Придумай свою задачу',
+        hero: '🐱',
+        story: 'Придумай задачу про два мешочка с разным процентом «вкусного» и запиши её. Потом обсудим с командой!',
+        placeholder: 'Например: Смешали мешочек А (150 г, 10% мармелада) и мешочек Б (250 г, 30% мармелада). Какой процент мармелада в смеси?',
+        saveLabel: '💾 Сохранить мою задачу'
+      }
+    ]
+  },
+  {
+    id: 4,
+    emoji: '🧙',
+    title: 'Лаборатория Профессора',
+    grade: 'Рабочий лист · 4 класс',
+    heroName: 'Профессор Мягкий',
+    desc: 'Растворы, таблицы и средневзвешенное',
+    intro: 'Друзья! В моей лаборатории беда. Я варю зелья для школьного праздника, но перепутал записи и не помню, сколько соли в каждом растворе. Помогите разобраться!',
+    outro: 'Вот это да! Вы не просто посчитали — вы вывели формулу, которой пользуются настоящие химики. Ошибка была моей, а победа — ваша!',
+    tasks: [
+      {
+        id: 'l4t1', type: 'inputs',
+        title: 'Таблица растворов',
+        hero: '🧙',
+        story: 'В лаборатории три раствора. Заполни таблицу — найди массу соли в каждом.',
+        visual: 'table',
+        table: [
+          {mass: 200, conc: 15, answer: 30},
+          {mass: 300, conc: 8, answer: 24},
+          {mass: 500, conc: 12, answer: 60}
+        ],
+        inputs: [
+          {label: 'Раствор №1: сколько граммов соли?', answer: 30, unit: 'г'},
+          {label: 'Раствор №2: сколько граммов соли?', answer: 24, unit: 'г'},
+          {label: 'Раствор №3: сколько граммов соли?', answer: 60, unit: 'г'},
+          {label: 'В каком растворе больше всего соли? (номер)', answer: 3, unit: '№'}
+        ],
+        solution: 'Соль = масса раствора × концентрация. 200 × 0,15 = 30. 300 × 0,08 = 24. 500 × 0,12 = 60. Больше всего — в третьем.'
+      },
+      {
+        id: 'l4t2', type: 'inputs',
+        title: 'Смешали поровну',
+        hero: '🧙',
+        story: 'Смешали 100 г 10%-го раствора и 100 г 30%-го раствора. Какая концентрация получилась?',
+        inputs: [
+          {label: 'Сколько всего соли в смеси?', answer: 40, unit: 'г'},
+          {label: 'Сколько весит вся смесь?', answer: 200, unit: 'г'},
+          {label: 'Какая концентрация смеси?', answer: 20, unit: '%'}
+        ],
+        solution: 'Соль: 10 + 30 = 40 г. Масса: 100 + 100 = 200 г. Концентрация: 40/200 = <b>20%</b>. Заметил? Это среднее арифметическое 10 и 30.'
+      },
+      {
+        id: 'l4t3', type: 'inputs',
+        title: 'Смешали с разными массами',
+        hero: '🧙',
+        story: 'Смешали 200 г 10%-го раствора и 300 г 20%-го. Какая концентрация? Осторожно: массы разные!',
+        inputs: [
+          {label: 'Сколько соли в первом растворе?', answer: 20, unit: 'г'},
+          {label: 'Сколько соли во втором?', answer: 60, unit: 'г'},
+          {label: 'Сколько соли всего?', answer: 80, unit: 'г'},
+          {label: 'Сколько весит смесь?', answer: 500, unit: 'г'},
+          {label: 'Какая концентрация смеси?', answer: 16, unit: '%'}
+        ],
+        solution: 'Соль: 20 + 60 = 80 г. Масса: 500 г. 80/500 = 0,16 = <b>16%</b>. Это НЕ (10+20)/2 = 15. Потому что у растворов разный «вес»!'
+      },
+      {
+        id: 'l4t4', type: 'inputs',
+        title: 'Олимпиадная: морская вода',
+        hero: '🧙',
+        story: 'Задача от Логика: в 300 г морской воды 4% соли. Добавили чистую воду — стало 3%. Сколько воды добавили?',
+        inputs: [
+          {label: 'Сколько соли в исходной воде?', answer: 12, unit: 'г'},
+          {label: 'Какой должна стать общая масса, чтобы 12 г — это 3%?', answer: 400, unit: 'г'},
+          {label: 'Сколько воды добавили?', answer: 100, unit: 'г'}
+        ],
+        solution: 'Соль не меняется: 300 × 0,04 = 12 г. Теперь 12 г — это 3% → вся масса = 12/0,03 = 400 г. Добавили: 400 − 300 = <b>100 г</b> воды.'
+      },
+      {
+        id: 'l4t5', type: 'creative',
+        title: 'Придумай свою задачу',
+        hero: '🧙',
+        story: 'Придумай задачу, где нужно найти, сколько добавили воды или вещества. Запиши её и решение.',
+        placeholder: 'Например: К 400 г 10%-го раствора добавили 100 г воды. Какая концентрация получилась?',
+        saveLabel: '💾 Сохранить мою задачу'
+      }
+    ]
+  },
+  {
+    id: 5,
+    emoji: '🐉',
+    title: 'Совет Алхимиков',
+    grade: 'Рабочий лист · 5 класс',
+    heroName: 'Дракон Деления, Логик и Принцесса Пятая',
+    desc: 'Сплавы, пробы, конверт Пирсона и олимпиада',
+    intro: 'Дракон Деления плавит сплавы, Логик строит чертежи, Принцесса Пятая выбирает лучший рецепт. Сегодня — большой Совет Алхимиков. Готовы пройти все испытания и получить звание Мастера Смесей?',
+    outro: 'Принцесса Пятая вручает тебе печать Мастера Смесей. Дракон довольно пыхтит паром, Логик записывает твой ход в летопись. Ты справился!',
+    tasks: [
+      {
+        id: 'l5t1', type: 'inputs',
+        title: 'Проба сплава',
+        hero: '🐉',
+        story: 'Дракон принёс кусок сплава меди с оловом. Весит 20 кг, содержит 30% меди. Что в нём?',
+        inputs: [
+          {label: 'Сколько килограммов меди в сплаве?', answer: 6, unit: 'кг'},
+          {label: 'Сколько килограммов олова?', answer: 14, unit: 'кг'},
+          {label: 'Сколько процентов олова?', answer: 70, unit: '%'}
+        ],
+        solution: 'Медь: 20 × 0,30 = 6 кг. Олово: 20 − 6 = 14 кг. Это 14/20 = <b>70%</b>.'
+      },
+      {
+        id: 'l5t2', type: 'inputs',
+        title: 'Добавили металл',
+        hero: '🐉',
+        story: 'К этому сплаву (20 кг, 30% меди) добавили чистое олово. Медь теперь составляет 20%. Сколько олова добавили?',
+        inputs: [
+          {label: 'Медь осталась прежней. Сколько её?', answer: 6, unit: 'кг'},
+          {label: 'Какой должна стать общая масса (чтобы 6 кг = 20%)?', answer: 30, unit: 'кг'},
+          {label: 'Сколько олова добавили?', answer: 10, unit: 'кг'}
+        ],
+        solution: 'Медь не меняется: 6 кг. Теперь 6 кг = 20% → вся масса = 6/0,20 = 30 кг. Добавили: 30 − 20 = <b>10 кг</b> олова.'
+      },
+      {
+        id: 'l5t3', type: 'pearson',
+        title: 'Конверт Пирсона',
+        hero: '🦉',
+        story: 'Логик показывает старинный метод. Смешали 70%-й и 10%-й растворы — получили 600 г 30%-го. Сколько взяли каждого?',
+        inputs: [
+          {label: 'Масса 70%-го раствора (г)', answer: 200, unit: 'г'},
+          {label: 'Масса 10%-го раствора (г)', answer: 400, unit: 'г'}
+        ],
+        solution: 'Разности: 30−10 = 20 (для 70%) и 70−30 = 40 (для 10%). Отношение 20:40 = 1:2. Всего частей 3. 600 ÷ 3 = 200 г на часть. 70%-го: 1×200 = <b>200 г</b>. 10%-го: 2×200 = <b>400 г</b>. Проверка: 200×0,7 + 400×0,1 = 140 + 40 = 180; 180/600 = 30%. ✓'
+      },
+      {
+        id: 'l5t4', type: 'inputs',
+        title: 'Олимпиадная: никель',
+        hero: '👸',
+        story: 'Принцесса Пятая: два сплава — 5% никеля и 20% никеля. Получили 225 кг с 15% никеля. На сколько масса первого сплава меньше массы второго?',
+        inputs: [
+          {label: 'Масса первого сплава (кг)', answer: 75, unit: 'кг'},
+          {label: 'Масса второго сплава (кг)', answer: 150, unit: 'кг'},
+          {label: 'На сколько первая масса меньше второй? (кг)', answer: 75, unit: 'кг'}
+        ],
+        solution: 'Пусть x — масса первого. 0,05x + 0,20(225−x) = 0,15·225. 0,05x + 45 − 0,20x = 33,75. −0,15x = −11,25. x = 75. Второй: 150. Разница: <b>75 кг</b>.'
+      },
+      {
+        id: 'l5t5', type: 'inputs',
+        title: 'Старинный чай',
+        hero: '👸',
+        story: 'Торговец смешал 3 кг чая по 220 р/кг и 7 кг второго сорта. Смесь стоит 171 р/кг. Сколько стоил второй сорт?',
+        inputs: [
+          {label: 'Стоимость 3 кг первого чая (р.)', answer: 660, unit: 'р.'},
+          {label: 'Стоимость всей смеси (р.)', answer: 1710, unit: 'р.'},
+          {label: 'Цена 1 кг второго сорта (р.)', answer: 150, unit: 'р.'}
+        ],
+        solution: 'Первый чай: 3 × 220 = 660 р. Вся смесь: 10 × 171 = 1710 р. Второй сорт: 1710 − 660 = 1050 р. за 7 кг → 1050/7 = <b>150 р/кг</b>.'
+      },
+      {
+        id: 'l5t6', type: 'creative',
+        title: 'Исследование',
+        hero: '🦉',
+        story: 'Можно ли, смешав 30%-й и 10%-й растворы, получить 25%-й? А 35%-й? Объясни и запиши свой вывод.',
+        placeholder: '25%-й — да/нет, потому что... 35%-й — да/нет, потому что...',
+        saveLabel: '💾 Сохранить исследование'
+      }
+    ]
+  }
+];
+
+/* ==================== СОСТОЯНИЕ ==================== */
+const LS = 'mm_alloys_worksheets_v1';
+let state = load() || freshState();
+function freshState(){
+  return { screen:'intro', coins:0, levelId:null, taskIdx:0, done:{}, creative:{} };
+}
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(LS)); }catch(e){ return null; } }
+
+const $ = id => document.getElementById(id);
+const main = () => $('main');
+const shuffle = a => a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+
+let AC = null;
+function beep(freq=880, dur=0.3){
+  try{
+    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.connect(g); g.connect(AC.destination);
+    o.type='sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.14, AC.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime+dur);
+    o.start(); o.stop(AC.currentTime+dur+0.02);
+  }catch(e){}
+}
+
+function confetti(n=22){
+  const fx = $('fx');
+  const emo = ['⭐','✨','🎉','💫','💜','🧩','🏅','🌟','🎈','🍫'];
+  for(let i=0;i<n;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = emo[Math.floor(Math.random()*emo.length)];
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.top = '-30px';
+    p.style.animationDuration = (1.1+Math.random()*1.2) + 's';
+    p.style.fontSize = (16+Math.random()*18) + 'px';
+    fx.appendChild(p);
+    setTimeout(()=>p.remove(), 2500);
+  }
+}
+
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._id);
+  t._id = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function updateHUD(){
+  $('coins').textContent = state.coins;
+}
+
+function levelDoneCount(level){
+  const done = state.done[level.id] || [];
+  return done.length;
+}
+
+/* ==================== ИНТРО ==================== */
+let confirmReset = false;
+function renderIntro(){
+  state.screen = 'intro';
+  save();
+  updateHUD();
+
+  const totalDone = LEVELS.reduce((s,l) => s + levelDoneCount(l), 0);
+  const totalTasks = LEVELS.reduce((s,l) => s + l.tasks.length, 0);
+
+  main().innerHTML = `
+    <section class="card">
+      <div class="hero">
+        <div style="font-size:62px;animation:float 3s ease-in-out infinite;display:inline-block">📐</div>
+        <div class="tag">Интерактивные рабочие листы · 3–5 класс</div>
+        <h1>Сплавы и смеси</h1>
+        <p>Три приключения с героями «Мягкой математики». Выбирай свой уровень, решай и зарабатывай монеты.</p>
+        <div class="chip" style="display:inline-flex;margin-bottom:8px">🎯 Пройдено: <b>${totalDone}</b> из ${totalTasks}</div>
+      </div>
+
+      <div class="level-grid">
+        ${LEVELS.map(l => {
+          const done = levelDoneCount(l);
+          const total = l.tasks.length;
+          const isDone = done >= total;
+          return `
+            <div class="level-card ${isDone?'done':''}" data-level="${l.id}">
+              <span class="lv-done">✅</span>
+              <span class="lv-emoji">${l.emoji}</span>
+              <div class="lv-grade">${l.grade}</div>
+              <div class="lv-title">${l.title}</div>
+              <div class="lv-desc">${l.desc}</div>
+              <div class="tiny" style="color:var(--p1d);font-weight:800">${done} / ${total} заданий</div>
+              <div class="lv-progress"><div style="width:${(done/total)*100}%"></div></div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <div class="promo-line">
+        <b>Мягкая математика</b> · подготовка к ОГЭ/ЕГЭ, ВПР и олимпиадам ·
+        <a href="https://vk.com/smartskillsmaria" target="_blank" rel="noopener">группа ВК</a> ·
+        <a href="https://vk.com/im/convo/-229273902?entrypoint=community_page&amp;tab=all" target="_blank" rel="noopener">написать Марии Абрамовой</a>
+      </div>
+    </section>
+  `;
+
+  main().querySelectorAll('.level-card').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      beep();
+      startLevel(+el.dataset.level);
+    });
+  });
+}
+
+/* ==================== СТАРТ УРОВНЯ ==================== */
+function startLevel(levelId){
+  const level = LEVELS.find(l => l.id === levelId);
+  if(!level) return;
+  const done = state.done[level.id] || [];
+  state.levelId = levelId;
+  state.taskIdx = Math.min(done.length, level.tasks.length - 1);
+  state.screen = 'level';
+  save();
+  renderLevelIntro(level);
+}
+
+function renderLevelIntro(level){
+  const done = state.done[level.id] || [];
+  const allDone = done.length >= level.tasks.length;
+  const btnLabel = allDone ? '🏆 Итоги листа' : (done.length > 0 ? `▶ Продолжить (${done.length+1}/${level.tasks.length})` : '🚀 Начать лист');
+
+  main().innerHTML = `
+    <section class="card">
+      <div class="stage-head">
+        <div class="world">${level.grade}</div>
+        <h2>${level.emoji} ${level.title}</h2>
+      </div>
+
+      <div class="hero-say">
+        <div class="hero-avatar">${level.emoji}</div>
+        <div class="hero-text"><b>${level.heroName}:</b> «${level.intro}»</div>
+      </div>
+
+      <div class="task-desc">
+        <b>В этом листе ${level.tasks.length} заданий:</b>
+        ${level.tasks.map((t,i) => `<div style="margin-top:6px">${i+1}. ${t.title}</div>`).join('')}
+      </div>
+
+      <div class="advance-row">
+        <button class="btn-n" id="backToMenu" type="button">← В меню</button>
+        <button class="btn-p" id="startLevelBtn" type="button">${btnLabel}</button>
+      </div>
+    </section>
+  `;
+
+  $('backToMenu').addEventListener('click', ()=>{ beep(); renderIntro(); });
+  $('startLevelBtn').addEventListener('click', ()=>{
+    beep();
+    if(allDone) renderLevelFinal(level);
+    else renderTask(level, done.length);
+  });
+}
+
+/* ==================== РЕНДЕР ЗАДАНИЯ ==================== */
+function renderTask(level, idx){
+  if(idx >= level.tasks.length){ renderLevelFinal(level); return; }
+  state.taskIdx = idx;
+  state.screen = 'task';
+  save();
+  updateHUD();
+
+  const task = level.tasks[idx];
+  const dots = level.tasks.map((_,i)=>{
+    const isDone = (state.done[level.id] || []).includes(level.tasks[i].id);
+    const cls = isDone ? 'done' : (i === idx ? 'now' : '');
+    return `<span class="${cls}"></span>`;
+  }).join('');
+
+  main().innerHTML = `
+    <section class="card">
+      <div class="stage-head">
+        <div class="world">${level.title} · задание ${idx+1} из ${level.tasks.length}</div>
+        <h2>${task.title}</h2>
+        <div class="dots">${dots}</div>
+      </div>
+
+      <div class="hero-say">
+        <div class="hero-avatar">${task.hero}</div>
+        <div class="hero-text"><b>${level.heroName}:</b> «${task.story}»</div>
+      </div>
+
+      <div id="taskBody"></div>
+
+      <div id="taskFeedback" class="fb hidden"></div>
+      <div id="taskHint" class="hint-box hidden"></div>
+
+      <div class="advance-row">
+        <button class="btn-n" id="backBtn" type="button">← В меню листа</button>
+        <button class="btn-g hidden" id="checkBtn" type="button">✓ Проверить</button>
+        <button class="btn-p hidden" id="nextBtn" type="button">${idx === level.tasks.length - 1 ? '🏆 Завершить лист' : 'Дальше →'}</button>
+      </div>
+    </section>
+  `;
+
+  const body = $('taskBody');
+  const fb = $('taskFeedback');
+  const hint = $('taskHint');
+  const checkBtn = $('checkBtn');
+  const nextBtn = $('nextBtn');
+  const backBtn = $('backBtn');
+
+  backBtn.addEventListener('click', ()=>{ beep(); renderLevelIntro(level); });
+
+  const alreadyDone = (state.done[level.id] || []).includes(task.id);
+
+  if(task.type === 'sort') renderTaskSort(body, task, level, idx, checkBtn, nextBtn, fb, hint, alreadyDone);
+  else if(task.type === 'inputs') renderTaskInputs(body, task, level, idx, checkBtn, nextBtn, fb, hint, alreadyDone);
+  else if(task.type === 'pearson') renderTaskPearson(body, task, level, idx, checkBtn, nextBtn, fb, hint, alreadyDone);
+  else if(task.type === 'creative') renderTaskCreative(body, task, level, idx, nextBtn, fb, alreadyDone);
+
+  nextBtn.addEventListener('click', ()=>{
+    beep();
+    const done = state.done[level.id] || [];
+    const nextIdx = done.length;
+    if(nextIdx >= level.tasks.length) renderLevelFinal(level);
+    else renderTask(level, nextIdx);
+  });
+
+  if(alreadyDone){
+    nextBtn.classList.remove('hidden');
+    fb.classList.remove('hidden');
+    fb.classList.add('ok');
+    fb.innerHTML = '<b>✓ Задание уже выполнено!</b> Можешь перейти дальше или пройти заново.';
+    if(task.type !== 'creative') checkBtn.classList.add('hidden');
+  }
+}
+
+/* ==================== ТИП: SORT ==================== */
+function renderTaskSort(body, task, level, idx, checkBtn, nextBtn, fb, hint, alreadyDone){
+  const items = shuffle([...task.items]);
+  body.innerHTML = `
+    <div class="pool" id="pool">
+      ${items.map(it => `<div class="chip-el" data-id="${it.id}" draggable="true">${it.emoji} ${it.text}</div>`).join('')}
+    </div>
+    <div class="baskets">
+      ${task.baskets.map(b => `
+        <div class="basket" data-basket="${b.id}">
+          <div class="basket-head"><span>${b.emoji}</span><span>${b.name}</span>${b.sub?`<span class="b-sub">${b.sub}</span>`:''}</div>
+          <div class="basket-body"></div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="center" style="margin-top:8px">
+      <button class="btn-n" id="resetSort" type="button" style="font-size:13px;padding:8px 14px">↺ Сброс</button>
+    </div>
+  `;
+  checkBtn.classList.remove('hidden');
+
+  const answers = {};
+  let selectedId = null;
+
+  function makePoolChip(item){
+    const chip = document.createElement('div');
+    chip.className = 'chip-el';
+    chip.dataset.id = item.id;
+    chip.draggable = true;
+    chip.textContent = `${item.emoji} ${item.text}`;
+    chip.addEventListener('click', ()=>{
+      body.querySelectorAll('#pool .chip-el').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selectedId = item.id;
+      beep(660, 0.1);
+    });
+    chip.addEventListener('dragstart', e=>{
+      selectedId = item.id;
+      e.dataTransfer.effectAllowed = 'move';
+      try{ e.dataTransfer.setData('text/plain', item.id); }catch(_){}
+      chip.classList.add('selected');
+    });
+    chip.addEventListener('dragend', ()=>chip.classList.remove('selected'));
+    return chip;
+  }
+
+  function place(chipId, basketId){
+    const item = task.items.find(it => it.id === chipId);
+    if(!item) return;
+    body.querySelectorAll('.basket-body .chip-el').forEach(c=>{
+      if(c.dataset.id === chipId) c.remove();
+    });
+    const poolChip = body.querySelector(`#pool .chip-el[data-id="${chipId}"]`);
+    if(poolChip) poolChip.remove();
+    const target = body.querySelector(`.basket[data-basket="${basketId}"] .basket-body`);
+    const chip = document.createElement('div');
+    chip.className = 'chip-el placed';
+    chip.dataset.id = chipId;
+    chip.textContent = `${item.emoji} ${item.text}`;
+    chip.addEventListener('click', ()=>{
+      chip.remove();
+      delete answers[chipId];
+      body.querySelector('#pool').appendChild(makePoolChip(item));
+      beep(440, 0.15);
+    });
+    target.appendChild(chip);
+    answers[chipId] = basketId;
+    beep(880, 0.15);
+  }
+
+  body.querySelectorAll('#pool .chip-el').forEach(chip=>{
+    chip.replaceWith(makePoolChip(task.items.find(it=>it.id===chip.dataset.id)));
+  });
+
+  body.querySelectorAll('.basket').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      if(selectedId){
+        place(selectedId, b.dataset.basket);
+        selectedId = null;
+        body.querySelectorAll('#pool .chip-el').forEach(c=>c.classList.remove('selected'));
+      }
+    });
+    b.addEventListener('dragover', e=>{ e.preventDefault(); b.classList.add('active-drop'); });
+    b.addEventListener('dragleave', ()=>b.classList.remove('active-drop'));
+    b.addEventListener('drop', e=>{
+      e.preventDefault();
+      b.classList.remove('active-drop');
+      let id = selectedId;
+      try{ const d = e.dataTransfer.getData('text/plain'); if(d) id = d; }catch(_){}
+      if(id) place(id, b.dataset.basket);
+      selectedId = null;
+    });
+  });
+
+  body.querySelector('#resetSort').addEventListener('click', ()=>{
+    body.querySelectorAll('.basket-body .chip-el').forEach(c=>c.remove());
+    Object.keys(answers).forEach(k => delete answers[k]);
+    const pool = body.querySelector('#pool');
+    pool.innerHTML = '';
+    shuffle([...task.items]).forEach(it=>pool.appendChild(makePoolChip(it)));
+    selectedId = null;
+    beep(440, 0.15);
+  });
+
+  checkBtn.onclick = ()=>{
+    if(Object.keys(answers).length !== task.items.length){ toast('Сначала разложи все карточки'); return; }
+    const wrongBaskets = new Set();
+    task.items.forEach(it => { if(answers[it.id] !== it.correct) wrongBaskets.add(answers[it.id]); });
+    if(wrongBaskets.size === 0){
+      fb.classList.remove('hidden','no'); fb.classList.add('ok');
+      fb.innerHTML = '<b>✓ Всё верно!</b> ' + task.solution;
+      checkBtn.classList.add('hidden');
+      nextBtn.classList.remove('hidden');
+      confetti(18); beep(1046, 0.4);
+      awardTask(level, task);
+    } else {
+      wrongBaskets.forEach(bid=>{
+        const b = body.querySelector(`.basket[data-basket="${bid}"]`);
+        if(b){ b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'), 900); }
+      });
+      fb.classList.remove('hidden','ok'); fb.classList.add('no');
+      fb.textContent = 'Не совсем. Проверь, что где лежит.';
+      beep(300, 0.2);
+    }
+  };
+}
+
+/* ==================== ТИП: INPUTS ==================== */
+function renderTaskInputs(body, task, level, idx, checkBtn, nextBtn, fb, hint, alreadyDone){
+  let visualHTML = '';
+  if(task.visual === 'candies' && task.candies){
+    visualHTML = `
+      <div class="candy-wrap">
+        <div class="candy-row">
+          ${task.candies.map(c => `<div class="candy-big">${c}</div>`).join('')}
+        </div>
+        <div class="candy-legend">🍫 — шоколадная · 🍬 — карамелька · всего 10 конфет</div>
+      </div>
+    `;
+  } else if(task.visual === 'two-bags'){
+    visualHTML = `
+      <div class="candy-wrap" style="background:linear-gradient(135deg,#f3ecff,#ffe7f0);border-color:#e3d0ff">
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:14px;font-weight:800;color:var(--p1d)">
+          <div style="background:#fff;padding:12px 16px;border-radius:14px;border:2px solid #e3d0ff">🎒 Мешочек А<br><span style="color:var(--soft);font-size:12px">100 г · 20% шоколадных</span></div>
+          <div style="font-size:26px;color:var(--p1d);align-self:center">+</div>
+          <div style="background:#fff;padding:12px 16px;border-radius:14px;border:2px solid #e3d0ff">👝 Мешочек Б<br><span style="color:var(--soft);font-size:12px">200 г · 50% шоколадных</span></div>
+          <div style="font-size:26px;color:var(--p1d);align-self:center">=</div>
+          <div style="background:#fff8e1;padding:12px 16px;border-radius:14px;border:2px solid #ffe1a3">🏺 Смесь<br><span style="color:#a06b12;font-size:12px">? г · ?%</span></div>
+        </div>
+      </div>
+    `;
+  } else if(task.visual === 'table' && task.table){
+    visualHTML = `
+      <div style="overflow-x:auto;margin:14px 0">
+        <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 12px rgba(74,54,140,.06)">
+          <thead>
+            <tr style="background:linear-gradient(135deg,#f3ecff,#ffe7f0)">
+              <th style="padding:10px;font-size:13px;color:var(--p1d);text-align:left;font-weight:900">Раствор</th>
+              <th style="padding:10px;font-size:13px;color:var(--p1d);text-align:center;font-weight:900">Масса</th>
+              <th style="padding:10px;font-size:13px;color:var(--p1d);text-align:center;font-weight:900">Концентрация</th>
+              <th style="padding:10px;font-size:13px;color:var(--p1d);text-align:center;font-weight:900">Соль</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${task.table.map((r,i) => `
+              <tr style="border-top:1px solid var(--line)">
+                <td style="padding:10px;font-weight:800">№${i+1}</td>
+                <td style="padding:10px;text-align:center;font-weight:700">${r.mass} г</td>
+                <td style="padding:10px;text-align:center;font-weight:700">${r.conc}%</td>
+                <td style="padding:10px;text-align:center;font-weight:900;color:var(--p1d)">?</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  body.innerHTML = `
+    ${visualHTML}
+    <div class="inputs-wrap">
+      ${task.inputs.map((inp,i) => `
+        <div class="input-row" data-i="${i}">
+          <div class="i-label"><span class="i-num">${i+1}</span>${inp.label}</div>
+          <input type="text" inputmode="decimal" placeholder="?" data-i="${i}" autocomplete="off">
+          <div class="i-unit">${inp.unit || ''}</div>
+          <div class="i-status"></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  checkBtn.classList.remove('hidden');
+  let attempts = 0;
+
+  checkBtn.onclick = ()=>{
+    let allCorrect = true;
+    task.inputs.forEach((inp, i) => {
+      const row = body.querySelector(`.input-row[data-i="${i}"]`);
+      const input = row.querySelector('input');
+      const status = row.querySelector('.i-status');
+      const val = parseFloat((input.value || '').trim().replace(',', '.'));
+      row.classList.remove('ok','no');
+      status.textContent = '';
+      if(isNaN(val)){
+        row.classList.add('no');
+        status.textContent = '✗';
+        status.style.color = 'var(--err)';
+        allCorrect = false;
+      } else if(Math.abs(val - inp.answer) < 0.001){
+        row.classList.add('ok');
+        status.textContent = '✓';
+        status.style.color = 'var(--ok)';
+      } else {
+        row.classList.add('no');
+        status.textContent = '✗';
+        status.style.color = 'var(--err)';
+        allCorrect = false;
+      }
+    });
+
+    if(allCorrect){
+      fb.classList.remove('hidden','no'); fb.classList.add('ok');
+      fb.innerHTML = '<b>✓ Всё верно!</b> ' + task.solution;
+      checkBtn.classList.add('hidden');
+      nextBtn.classList.remove('hidden');
+      confetti(18); beep(1046, 0.4);
+      awardTask(level, task);
+    } else {
+      attempts++;
+      fb.classList.remove('hidden','ok'); fb.classList.add('no');
+      fb.textContent = 'Не всё пока верно. Исправь красные строки и попробуй снова.';
+      beep(300, 0.2);
+      if(attempts >= 2){
+        hint.classList.remove('hidden');
+        hint.innerHTML = '💡 <b>Подсказка:</b> ' + task.solution;
+      }
+    }
+  };
+
+  body.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); checkBtn.click(); }
+    });
+  });
+}
+
+/* ==================== ТИП: PEARSON ==================== */
+function renderTaskPearson(body, task, level, idx, checkBtn, nextBtn, fb, hint, alreadyDone){
+  body.innerHTML = `
+    <div class="pearson">
+      <div style="text-align:center;font-weight:900;color:var(--p1d);margin-bottom:12px;font-size:14px">📐 Конверт Пирсона</div>
+      <div class="p-grid">
+        <div class="p-cell pct">70%</div>
+        <div class="p-cell diff">30 − 10 = 20 частей</div>
+        <div class="p-center-row"><span class="p-mid">30%</span></div>
+        <div class="p-cell pct2">10%</div>
+        <div class="p-cell diff">70 − 30 = 40 частей</div>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--soft);font-weight:700;line-height:1.5">
+        Отношение масс: <b style="color:var(--p1d)">20 : 40 = 1 : 2</b><br>
+        Всего частей: <b style="color:var(--p1d)">3</b> · Общая масса: <b style="color:var(--p1d)">600 г</b>
+      </div>
+    </div>
+    <div class="inputs-wrap">
+      ${task.inputs.map((inp,i) => `
+        <div class="input-row" data-i="${i}">
+          <div class="i-label"><span class="i-num">${i+1}</span>${inp.label}</div>
+          <input type="text" inputmode="decimal" placeholder="?" data-i="${i}" autocomplete="off">
+          <div class="i-unit">${inp.unit || ''}</div>
+          <div class="i-status"></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  checkBtn.classList.remove('hidden');
+  let attempts = 0;
+
+  checkBtn.onclick = ()=>{
+    let allCorrect = true;
+    task.inputs.forEach((inp, i) => {
+      const row = body.querySelector(`.input-row[data-i="${i}"]`);
+      const input = row.querySelector('input');
+      const status = row.querySelector('.i-status');
+      const val = parseFloat((input.value || '').trim().replace(',', '.'));
+      row.classList.remove('ok','no');
+      status.textContent = '';
+      if(isNaN(val) || Math.abs(val - inp.answer) > 0.001){
+        row.classList.add('no');
+        status.textContent = '✗';
+        status.style.color = 'var(--err)';
+        allCorrect = false;
+      } else {
+        row.classList.add('ok');
+        status.textContent = '✓';
+        status.style.color = 'var(--ok)';
+      }
+    });
+    if(allCorrect){
+      fb.classList.remove('hidden','no'); fb.classList.add('ok');
+      fb.innerHTML = '<b>✓ Верно!</b> ' + task.solution;
+      checkBtn.classList.add('hidden');
+      nextBtn.classList.remove('hidden');
+      confetti(18); beep(1046, 0.4);
+      awardTask(level, task);
+    } else {
+      attempts++;
+      fb.classList.remove('hidden','ok'); fb.classList.add('no');
+      fb.textContent = 'Не всё верно. Проверь отношение частей и общую массу.';
+      beep(300, 0.2);
+      if(attempts >= 2){
+        hint.classList.remove('hidden');
+        hint.innerHTML = '💡 <b>Подсказка:</b> ' + task.solution;
+      }
+    }
+  };
+
+  body.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); checkBtn.click(); }
+    });
+  });
+}
+
+/* ==================== ТИП: CREATIVE ==================== */
+function renderTaskCreative(body, task, level, idx, nextBtn, fb, alreadyDone){
+  const saved = state.creative[task.id] || '';
+  body.innerHTML = `
+    <div class="creative-wrap">
+      <textarea id="creativeTA" placeholder="${task.placeholder || ''}">${saved}</textarea>
+    </div>
+    <div class="center">
+      <button class="btn-g" id="saveCreative" type="button">${task.saveLabel || '💾 Сохранить'}</button>
+    </div>
+  `;
+
+  const ta = $('creativeTA');
+  const saveBtn = $('saveCreative');
+
+  saveBtn.addEventListener('click', ()=>{
+    state.creative[task.id] = ta.value.trim();
+    save();
+    beep(880, 0.2);
+    fb.classList.remove('hidden','no'); fb.classList.add('ok');
+    fb.innerHTML = '<b>✓ Сохранено!</b> Твоя идея записана. Можешь изменить и сохранить ещё раз или перейти дальше.';
+    nextBtn.classList.remove('hidden');
+    if(!(state.done[level.id] || []).includes(task.id)){
+      awardTask(level, task, 5);
+    }
+    confetti(10);
+  });
+}
+
+/* ==================== НАГРАДА ==================== */
+function awardTask(level, task, coins = 10){
+  if(!state.done[level.id]) state.done[level.id] = [];
+  if(!state.done[level.id].includes(task.id)){
+    state.done[level.id].push(task.id);
+    state.coins += coins;
+    save();
+    updateHUD();
+  }
+}
+
+/* ==================== ФИНАЛ УРОВНЯ ==================== */
+function renderLevelFinal(level){
+  state.screen = 'levelFinal';
+  save();
+  updateHUD();
+  const done = (state.done[level.id] || []).length;
+  const total = level.tasks.length;
+  const allDone = done >= total;
+
+  main().innerHTML = `
+    <section class="card level-final">
+      <div class="trophy">${allDone ? '🏆' : '🎖'}</div>
+      <h2 style="margin:6px 0;background:linear-gradient(135deg,var(--p1d),var(--p2));-webkit-background-clip:text;background-clip:text;color:transparent">
+        ${allDone ? 'Лист пройден!' : 'Хороший старт!'}
+      </h2>
+      <p class="sub" style="color:var(--soft);margin:0 0 8px">${level.title} · ${level.grade}</p>
+      <div class="medal">${allDone ? '⭐ Мастер листа' : '📖 Ученик'}</div>
+
+      <div class="recap">
+        <h3>Что было в этом листе</h3>
+        ${level.tasks.map((t,i) => {
+          const isDone = (state.done[level.id] || []).includes(t.id);
+          return `<div class="r-line"><span>${isDone ? '✓' : '○'}</span><span>${t.title}</span></div>`;
+        }).join('')}
+      </div>
+
+      <div class="hero-say" style="margin-top:16px;text-align:left">
+        <div class="hero-avatar">${level.emoji}</div>
+        <div class="hero-text"><b>${level.heroName}:</b> «${allDone ? level.outro : 'Продолжим в следующий раз — ты на верном пути!'}»</div>
+      </div>
+
+      <div class="advance-row" style="margin-top:14px">
+        <button class="btn-n" id="toMenuBtn" type="button">🏠 К выбору листа</button>
+        ${!allDone ? `<button class="btn-p" id="continueBtn" type="button">▶ Продолжить</button>` : `<button class="btn-p" id="againBtn" type="button">↺ Пройти заново</button>`}
+      </div>
+      <p class="tiny" style="margin-top:16px">Монет заработано: <b style="color:var(--p1d)">${state.coins}</b></p>
+    </section>
+  `;
+
+  if(allDone){
+    confetti(50);
+    setTimeout(()=>confetti(30), 600);
+    beep(1046, 0.6);
+  }
+
+  $('toMenuBtn').addEventListener('click', ()=>{ beep(); renderIntro(); });
+  if(!allDone){
+    $('continueBtn').addEventListener('click', ()=>{
+      beep();
+      renderTask(level, done);
+    });
+  } else {
+    $('againBtn').addEventListener('click', ()=>{
+      beep();
+      state.done[level.id] = [];
+      Object.keys(state.creative).forEach(k => { if(k.startsWith('l'+level.id)) delete state.creative[k]; });
+      save();
+      renderLevelIntro(level);
+    });
+  }
+}
+
+/* ==================== МЕНЮ ==================== */
+$('menuBtn').addEventListener('click', ()=>{ beep(); renderIntro(); });
+
+/* ==================== BOOT ==================== */
+(function boot(){
+  updateHUD();
+  if(state.screen === 'task' && state.levelId){
+    const level = LEVELS.find(l => l.id === state.levelId);
+    if(level) renderTask(level, state.taskIdx || 0);
+    else renderIntro();
+  } else if(state.screen === 'levelFinal' && state.levelId){
+    const level = LEVELS.find(l => l.id === state.levelId);
+    if(level) renderLevelFinal(level);
+    else renderIntro();
+  } else {
+    renderIntro();
+  }
+})();
+</script>
+</body>
+</html>
